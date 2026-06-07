@@ -1,6 +1,7 @@
 class SeatStore:
     def __init__(self, seat_ids):
         self._seats = {seat_id: None for seat_id in seat_ids}
+        self._wait_lines = {seat_id: [] for seat_id in seat_ids}    
 
     def list_seats(self):
         return self._seats.items()
@@ -11,15 +12,26 @@ class SeatStore:
             raise ValueError("Seat is already reserved.")
         self._seats[seat_id] = name
         return seat_id, name
-
+    def wait(self, seat_id, name):
+        current = self._get(seat_id)
+        if current is None:
+            raise ValueError("Seat is empty. Please reserve it directly.")
+        self._wait_lines[seat_id].append(name)
+        return seat_id, name
+    
     def cancel(self, seat_id, name=None):
         current = self._get(seat_id)
         if current is None:
             raise ValueError("Seat is not reserved.")
         if name and current != name:
             raise ValueError("Name does not match the reservation.")
-        self._seats[seat_id] = None
-        return seat_id, None
+        if self._wait_lines[seat_id]:
+            next_user = self._wait_lines[seat_id].pop(0)
+            self._seats[seat_id] = next_user
+            return seat_id, Next_user
+        else:
+            self._seats[seat_id] = None
+            return seat_id, None
 
     def status(self, seat_id):
         return seat_id, self._get(seat_id)
