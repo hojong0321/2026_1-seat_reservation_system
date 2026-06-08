@@ -28,7 +28,7 @@ class SeatStore:
         if self._wait_lines[seat_id]:
             next_user = self._wait_lines[seat_id].pop(0)
             self._seats[seat_id] = next_user
-            return seat_id, Next_user
+            return seat_id, next_user
         else:
             self._seats[seat_id] = None
             return seat_id, None
